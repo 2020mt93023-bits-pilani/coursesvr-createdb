@@ -1,0 +1,22 @@
+version: '3'
+
+services:
+  coursesvcapp:
+    build: .
+    image: sansubba/coursesvc-createdb-alpine:1.0
+    depends_on:
+      - maria_db
+    networks:
+      - svcnet
+
+  maria_db:
+    image: mariadb:latest
+    environment:
+      - MARIADB_ALLOW_EMPTY_ROOT_PASSWORD=yes
+      - MARIADB_DATABASE=courses
+    networks:
+      - svcnet
+
+networks:
+  svcnet:
+    driver: bridge
