@@ -1,11 +1,28 @@
 version: '3'
 
 services:
-  coursesvcapp:
-    build: .
+  createcoursedbsvcapp:
+    build: ./createdbsvc
     image: sansubba/coursesvc-createdb-alpine:1.0
     depends_on:
       - maria_db
+    networks:
+      - svcnet
+
+  courseapi:
+    build: ./courseapi
+    image: sansubba/coursesvc-createdb-alpine:1.0
+    depends_on:
+      - maria_db
+    networks:
+      - svcnet
+
+  coursesvc:
+    build: ./coursesvc
+    image: sansubba/coursesvc-createdb-alpine:1.0
+    depends_on:
+      - maria_db
+      - rabbit_mq
     networks:
       - svcnet
 
@@ -14,6 +31,11 @@ services:
     environment:
       - MARIADB_ALLOW_EMPTY_ROOT_PASSWORD=yes
       - MARIADB_DATABASE=courses
+    networks:
+      - svcnet
+
+  rabbit_mq:
+    image: rabbitmq:3-management
     networks:
       - svcnet
 
