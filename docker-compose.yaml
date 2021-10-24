@@ -2,7 +2,8 @@ version: '3'
 
 services:
   createcoursedbsvcapp:
-    build: ./createdbsvc
+    build: 
+      context: ./createdbsvc
     image: sansubba/coursesvc-createdb-alpine:1.0
     depends_on:
       - maria_db
@@ -10,19 +11,24 @@ services:
       - svcnet
 
   courseapi:
-    build: ./courseapi
-    image: sansubba/coursesvc-createdb-alpine:1.0
+    build:
+      context: ./courseapi
+    image: sansubba/courseapi-alpine:1.0
     depends_on:
-      - maria_db
+      - rabbit_mq
+    ports:
+      - 8080:8080
     networks:
       - svcnet
 
   coursesvc:
-    build: ./coursesvc
-    image: sansubba/coursesvc-createdb-alpine:1.0
+    build: 
+      context: ./coursesvc
+    image: sansubba/coursesvc-alpine:1.0
     depends_on:
-      - maria_db
       - rabbit_mq
+      - createcoursedbsvcapp
+      - maria_db
     networks:
       - svcnet
 
@@ -33,11 +39,16 @@ services:
       - MARIADB_DATABASE=courses
     networks:
       - svcnet
+    ports:
+      - 3306:3306
 
   rabbit_mq:
     image: rabbitmq:3-management
     networks:
       - svcnet
+    ports:
+      - 15672:15672
+      - 5672:5672
 
 networks:
   svcnet:
